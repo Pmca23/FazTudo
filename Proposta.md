@@ -112,13 +112,56 @@ Mockups disponíveis em: [FazTudo - Figma](https://www.figma.com/make/2AUanzGmjU
 ---
 
 ### 4.6 Planeamento (Gráfico de Gantt)
-| Fase                  | Início     | Fim        | Responsável                      |
-|-----------------------|------------|------------|----------------------------------|
-| Análise de Requisitos | 01/10/2025 | 05/10/2025 | Paulo Alberto                    |
-| Design UI (Figma)     | 06/10/2025 | 10/10/2025 | Mateus Reis, Bruno Gouveia       |
-| Desenvolvimento App   | 11/10/2025 | 30/10/2025 | Ngweza Van-Dúnem                 |
-| Testes e Ajustes      | 01/11/2025 | 05/11/2025 | Toda a Equipa                    |
-| Lançamento Beta       | 06/11/2025 | 10/11/2025 | Toda a Equipa                    |
+
+| Fase | Início | Fim | Responsável |
+|------|---------|-----|--------------|
+| Análise de Requisitos | 01/10/2025 | 05/10/2025 | Paulo Alberto |
+| Planeamento do Projeto e WBS | 06/10/2025 | 08/10/2025 | Mateus Reis, Bruno Gouveia |
+| Design UI (Figma) | 09/10/2025 | 15/10/2025 | Mateus Reis |
+| Modelação da Base de Dados | 16/10/2025 | 20/10/2025 | Bruno Gouveia |
+| Desenvolvimento do Backend | 21/10/2025 | 05/11/2025 | Ngweza Van-Dúnem |
+| Desenvolvimento do Frontend Android | 06/11/2025 | 20/11/2025 | Paulo Alberto |
+| Integração Backend + Frontend | 21/11/2025 | 27/11/2025 | Toda a Equipa |
+| Testes Unitários e Funcionais | 28/11/2025 | 05/12/2025 | Bruno Gouveia, Mateus Reis |
+| Otimização e Correção de Bugs | 06/12/2025 | 10/12/2025 | Toda a Equipa |
+| Preparação da Apresentação e Vídeo | 11/12/2025 | 13/12/2025 | Paulo Alberto, Ngweza Van-Dúnem |
+| Lançamento Beta Final | 14/12/2025 | 14/12/2025 | Toda a Equipa |
+
+---
+
+### 4.7 Plano de Trabalhos
+
+1. **Planeamento Inicial**
+   - Definir o escopo do projeto e os principais requisitos.
+   - Recolher informação sobre aplicações semelhantes (Fiverr, Oscar).
+   - Estabelecer cronograma e responsabilidades.
+
+2. **Design e Modelação**
+   - Criação do mockup no Figma: [FazTudo - Figma](https://www.figma.com/make/2AUanzGmjUeCrwQQst3u65/FazTudo-Service-App?node-id=0-1&t=71l5VkpcWlIXZ80o-1)
+   - Definir o modelo de dados (entidades: Utilizador, Prestador, Serviço, Avaliação, Pagamento).
+   - Especificar arquitetura da aplicação (Android + Firebase).
+
+3. **Desenvolvimento**
+   - Implementação do Backend (autenticação, gestão de serviços e utilizadores).
+   - Desenvolvimento do Frontend em Android (Kotlin/Java).
+   - Integração entre módulos e API REST.
+
+4. **Testes**
+   - Testes unitários e funcionais.
+   - Testes de integração e desempenho.
+   - Validação com casos de utilização definidos.
+
+5. **Entrega e Divulgação**
+   - Preparação do relatório final e exportação em PDF.
+   - Criação do vídeo promocional (1-2 minutos, estilo anúncio).
+   - Desenvolvimento do poster da aplicação.
+   - Apresentação oral e demonstração da App no telemóvel.
+
+---
+
+**Observações:**
+- O projeto decorre entre **1 de outubro e 14 de dezembro de 2025**.  
+- A fase final inclui correções e otimizações com base nos testes e feedback dos utilizadores.
 
 ---
 
