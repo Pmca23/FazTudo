@@ -5,7 +5,7 @@
 - **Faculdade:** IADE 
 - **Grupo:** Paulo Alberto 20240873, Mateus Reis 20241799, Ngweza Van-Dúnem 20240075, Bruno Gouveia 20240181
 - **Nome do Projeto:** FazTudo - Plataforma de Serviços  
-- **Repositório GitHub:**  [FazTudo]((https://github.com/Pmca23/FazTudo))  
+- **Repositório GitHub:**  [FazTudo](https://github.com/Pmca23/FazTudo)  
 
 ---
 
