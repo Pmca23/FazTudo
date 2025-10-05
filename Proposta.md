@@ -3,7 +3,7 @@
 ## 1. Identificação
 - **Universidade:** Universidade Europeia 
 - **Faculdade:** IADE 
-- **Grupo:** Paulo Alberto 20240873, Mateus Reis 20241799, Ngweza Van-Dúnem 20240075  
+- **Grupo:** Paulo Alberto 20240873, Mateus Reis 20241799, Ngweza Van-Dúnem 20240075, Bruno Gouveia 20240181
 - **Nome do Projeto:** FazTudo - Plataforma de Serviços  
 - **Repositório GitHub:**  
 
@@ -57,15 +57,15 @@
 ## 4. Plano de Trabalhos
 
 ### 4.1 Project Charter
-| Elemento              | Descrição                                         |
-|-----------------------|---------------------------------------------------|
-| Nome do Projeto       | FazTudo - Plataforma de Serviços                  |
-| Objetivo Principal    | Ligar clientes e prestadores num só ambiente      |
-| Stakeholders          | Clientes, Prestadores, Equipa de Desenvolvimento  |
-| Equipa                | Paulo Alberto, Mateus Reis, Ngweza Van-Dúnem      |
-| Tecnologia            | Android (Kotlin/Java)                             |
-| Entregas Principais   | App Android, Documentação, Vídeo, Poster          |
-| Riscos                | Atrasos no desenvolvimento, Falhas técnicas       |
+| Elemento              | Descrição                                                        |
+|-----------------------|------------------------------------------------------------------|
+| Nome do Projeto       | FazTudo - Plataforma de Serviços                                 |
+| Objetivo Principal    | Ligar clientes e prestadores num só ambiente                     |
+| Stakeholders          | Clientes, Prestadores, Equipa de Desenvolvimento                 |
+| Equipa                | Paulo Alberto, Mateus Reis, Ngweza Van-Dúnem, Bruno Gouveia      |
+| Tecnologia            | Android (Kotlin/Java)                                            |
+| Entregas Principais   | App Android, Documentação, Vídeo, Poster                         |
+| Riscos                | Atrasos no desenvolvimento, Falhas técnicas                      |
 
 ---
 
@@ -112,13 +112,13 @@ Mockups disponíveis em: [FazTudo - Figma](https://www.figma.com/make/2AUanzGmjU
 ---
 
 ### 4.6 Planeamento (Gráfico de Gantt)
-| Fase                  | Início     | Fim        | Responsável        |
-|-----------------------|------------|------------|--------------------|
-| Análise de Requisitos | 01/10/2025 | 05/10/2025 | Paulo Alberto      |
-| Design UI (Figma)     | 06/10/2025 | 10/10/2025 | Mateus Reis        |
-| Desenvolvimento App   | 11/10/2025 | 30/10/2025 | Ngweza Van-Dúnem   |
-| Testes e Ajustes      | 01/11/2025 | 05/11/2025 | Toda a Equipa      |
-| Lançamento Beta       | 06/11/2025 | 10/11/2025 | Toda a Equipa      |
+| Fase                  | Início     | Fim        | Responsável                      |
+|-----------------------|------------|------------|----------------------------------|
+| Análise de Requisitos | 01/10/2025 | 05/10/2025 | Paulo Alberto                    |
+| Design UI (Figma)     | 06/10/2025 | 10/10/2025 | Mateus Reis, Bruno Gouveia       |
+| Desenvolvimento App   | 11/10/2025 | 30/10/2025 | Ngweza Van-Dúnem                 |
+| Testes e Ajustes      | 01/11/2025 | 05/11/2025 | Toda a Equipa                    |
+| Lançamento Beta       | 06/11/2025 | 10/11/2025 | Toda a Equipa                    |
 
 ---
 
