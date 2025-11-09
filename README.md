@@ -346,7 +346,7 @@ A API foi desenvolvida em **Spring Boot** e expõe endpoints REST para gerir uti
 
 Base URL (ambiente local):
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   http://localhost:8080   `
+YAMLXML`   http://localhost:8080   `
 
 ### 6.1. Autenticação e Utilizadores
 
@@ -358,7 +358,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Resposta 200:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_user": 1,      "nome": "João Silva",      "email": "joao@example.com",      "telemovel": "912345678"    }  ]   `
+YAMLXML`   [    {      "id_user": 1,      "nome": "João Silva",      "email": "joao@example.com",      "telemovel": "912345678"    }  ]   `
 
 #### 6.1.2. Registar utilizador (com opção de vendedor)
 
@@ -375,19 +375,19 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Body – utilizador normal:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "nome": "Maria Silva",    "email": "maria@example.com",    "telemovel": "912345678",    "palavra_passe": "123456",    "is_vendedor": false  }   `
+YAMLXML`   {    "nome": "Maria Silva",    "email": "maria@example.com",    "telemovel": "912345678",    "palavra_passe": "123456",    "is_vendedor": false  }   `
 
 **Body – utilizador que é também vendedor:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "nome": "Carlos Prestador",    "email": "carlos@example.com",    "telemovel": "919191919",    "palavra_passe": "abc123",    "is_vendedor": true,    "categorias": [1, 3, 5]  }   `
+YAMLXML`   {    "nome": "Carlos Prestador",    "email": "carlos@example.com",    "telemovel": "919191919",    "palavra_passe": "abc123",    "is_vendedor": true,    "categorias": [1, 3, 5]  }   `
 
 **Resposta 201 (quando também cria vendedor):**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "user": {      "id_user": 11,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "vendedor": {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "token": "JWT_AQUI"  }   `
+YAMLXML`   {    "user": {      "id_user": 11,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "vendedor": {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "token": "JWT_AQUI"  }   `
 
 **Erros:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Email já existe" }   `
+YAMLXML`   { "error": "Email já existe" }   `
 
 #### 6.1.3. Login
 
@@ -397,7 +397,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Body:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "email": "carlos@example.com",    "palavra_passe": "abc123"  }   `
+YAMLXML`   {    "email": "carlos@example.com",    "palavra_passe": "abc123"  }   `
 
 **Resposta 200:**
 
@@ -429,7 +429,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Resposta 404:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Vendedor não encontrado." }   `
+YAMLXML`   { "error": "Vendedor não encontrado." }   `
 
 #### 6.2.3. Obter vendedor pelo id do utilizador
 
@@ -439,11 +439,11 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Resposta 200:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id_vendedor": 4,    "nome": "Carlos Prestador",    "email": "carlos@example.com"  }   `
+YAMLXML`   {    "id_vendedor": 4,    "nome": "Carlos Prestador",    "email": "carlos@example.com"  }   `
 
 **Resposta 404:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Este utilizador não é vendedor." }   `
+YAMLXML`   { "error": "Este utilizador não é vendedor." }   `
 
 #### 6.2.4. Listar vendedores de uma categoria
 
@@ -453,7 +453,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Resposta 200:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    {      "id_vendedor": 6,      "nome": "Joana Limpezas",      "email": "joana@clean.pt"    }  ]   `
+yYAMLXML`   [    {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    {      "id_vendedor": 6,      "nome": "Joana Limpezas",      "email": "joana@clean.pt"    }  ]   `
 
 ### 6.3. Serviços
 
@@ -472,11 +472,11 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Body:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "titulo": "Arranjar tomada",    "preco": 35.5,    "id_user": 11,    "id_vendedor_categoria": 2,    "id_estado": 1  }   `
+YAMLXML`   {    "titulo": "Arranjar tomada",    "preco": 35.5,    "id_user": 11,    "id_vendedor_categoria": 2,    "id_estado": 1  }   `
 
 **Resposta 201:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id_servico": 8,    "titulo": "Arranjar tomada",    "preco": 35.5  }   `
+YAMLXML`   {    "id_servico": 8,    "titulo": "Arranjar tomada",    "preco": 35.5  }   `
 
 #### 6.3.2. Listar todos os serviços
 
@@ -490,7 +490,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 
 **Resposta 200:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_servico": 8,      "titulo": "Arranjar tomada",      "preco": 35.5    }  ]   `
+YAMLXML`   [    {      "id_servico": 8,      "titulo": "Arranjar tomada",      "preco": 35.5    }  ]   `
 
 #### 6.3.4. Listar serviços por categoria de vendedor
 
@@ -506,7 +506,7 @@ Se quiseres expor as categorias para o frontend/Android:
 
 **Resposta 200:**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    { "id_categoria": 1, "nome": "Canalização" },    { "id_categoria": 2, "nome": "Eletricidade" },    { "id_categoria": 3, "nome": "Limpezas" }  ]   `
+YAMLXML`   [    { "id_categoria": 1, "nome": "Canalização" },    { "id_categoria": 2, "nome": "Eletricidade" },    { "id_categoria": 3, "nome": "Limpezas" }  ]   `
 
 7\. Estrutura de Dados
 ----------------------
