@@ -320,6 +320,21 @@ JOIN categoria c ON vc.id_categoria = c.id_categoria
 JOIN estado e ON s.id_estado = e.id_estado
 WHERE e.nome = 'Ativo';
 ```
+### 5.7. Conclusão da Base de Dados
+
+A base de dados **FazTudoDB** cumpre os requisitos funcionais identificados para a aplicação “FazTudo”, permitindo:
+- gerir utilizadores e vendedores com localizações normalizadas;
+- organizar serviços por categorias e por vendedor;
+- controlar o estado de cada serviço;
+- registar feedback dos utilizadores através de avaliações.
+
+O modelo está normalizado e as **chaves estrangeiras** garantem a integridade referencial (por exemplo, um serviço só existe se existir o respetivo vendedor/categoria e o utilizador que o requisitou).  
+A estrutura é suficientemente genérica para futuras extensões, como:
+- novas tabelas de pagamentos/faturas;
+- histórico de estados de serviço;
+- mensagens entre utilizador e vendedor.
+
+Assim, a BD serve de base estável para a API e para o frontend móvel, mantendo os dados consistentes e auditáveis.
 
 
 ---
