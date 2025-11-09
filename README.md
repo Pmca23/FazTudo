@@ -337,6 +337,286 @@ A estrutura é suficientemente genérica para futuras extensões, como:
 Assim, a BD serve de base estável para a API e para o frontend móvel, mantendo os dados consistentes e auditáveis.
 
 
+
+
+6\. API REST da Aplicação FazTudo
+---------------------------------
+
+A API foi desenvolvida em **Spring Boot** e expõe endpoints REST para gerir utilizadores, vendedores, categorias, serviços e autenticação.A base de dados usada é MySQL (faztudodb).
+
+Base URL (ambiente local):
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   http://localhost:8080   `
+
+### 6.1. Autenticação e Utilizadores
+
+#### 6.1.1. Listar todos os utilizadores
+
+**GET** /api/users
+
+**Descrição:** devolve todos os utilizadores registados no sistema.
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_user": 1,      "nome": "João Silva",      "email": "joao@example.com",      "telemovel": "912345678"    }  ]   `
+
+#### 6.1.2. Registar utilizador (com opção de vendedor)
+
+**POST** /api/users/register
+
+**Descrição:**
+
+*   cria sempre um **user**;
+    
+*   se o campo is\_vendedor vier como true, cria também um **vendedor** associado a esse user;
+    
+*   se vier o array categorias, cria também registos em vendedor\_categoria.
+    
+
+**Body – utilizador normal:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "nome": "Maria Silva",    "email": "maria@example.com",    "telemovel": "912345678",    "palavra_passe": "123456",    "is_vendedor": false  }   `
+
+**Body – utilizador que é também vendedor:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "nome": "Carlos Prestador",    "email": "carlos@example.com",    "telemovel": "919191919",    "palavra_passe": "abc123",    "is_vendedor": true,    "categorias": [1, 3, 5]  }   `
+
+**Resposta 201 (quando também cria vendedor):**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "user": {      "id_user": 11,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "vendedor": {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "token": "JWT_AQUI"  }   `
+
+**Erros:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Email já existe" }   `
+
+#### 6.1.3. Login
+
+**POST** /api/users/login
+
+**Descrição:** valida as credenciais e devolve um token JWT e dados do utilizador. O backend também verifica se o utilizador tem perfil de vendedor.
+
+**Body:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "email": "carlos@example.com",    "palavra_passe": "abc123"  }   `
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "token": "JWT_AQUI",    "id_user": 11,    "nome": "Carlos Prestador",    "is_vendedor": true  }   `
+
+**Erros:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Credenciais inválidas" }   `
+
+### 6.2. Vendedores
+
+> Nota: neste projeto, o vendedor costuma ser criado automaticamente no /api/users/register quando o campo is\_vendedor = true. Estes endpoints servem sobretudo para consulta.
+
+#### 6.2.1. Listar vendedores
+
+**GET** /api/vendedores
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_vendedor": 1,      "nome": "João Eletricista",      "email": "joao@eletric.pt",      "telemovel": "912345678"    }  ]   `
+
+#### 6.2.2. Obter vendedor por ID
+
+**GET** /api/vendedores/{id}
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id_vendedor": 3,    "nome": "Pedro Canalizador",    "email": "pedro@canos.pt"  }   `
+
+**Resposta 404:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Vendedor não encontrado." }   `
+
+#### 6.2.3. Obter vendedor pelo id do utilizador
+
+**GET** /api/vendedores/user/{idUser}
+
+**Descrição:** útil para o frontend/Android, para saber se o utilizador logado tem perfil de vendedor.
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id_vendedor": 4,    "nome": "Carlos Prestador",    "email": "carlos@example.com"  }   `
+
+**Resposta 404:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Este utilizador não é vendedor." }   `
+
+#### 6.2.4. Listar vendedores de uma categoria
+
+**GET** /api/vendedores/categoria/{idCategoria}
+
+**Descrição:** devolve os vendedores que pertencem a uma determinada categoria (com base na tabela de ligação vendedor\_categoria).
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    {      "id_vendedor": 6,      "nome": "Joana Limpezas",      "email": "joana@clean.pt"    }  ]   `
+
+### 6.3. Serviços
+
+#### 6.3.1. Criar serviço
+
+**POST** /api/servicos
+
+**Descrição:** cria um serviço associado a:
+
+*   um utilizador (id\_user);
+    
+*   uma categoria de vendedor (id\_vendedor\_categoria);
+    
+*   e um estado (id\_estado).
+    
+
+**Body:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "titulo": "Arranjar tomada",    "preco": 35.5,    "id_user": 11,    "id_vendedor_categoria": 2,    "id_estado": 1  }   `
+
+**Resposta 201:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id_servico": 8,    "titulo": "Arranjar tomada",    "preco": 35.5  }   `
+
+#### 6.3.2. Listar todos os serviços
+
+**GET** /api/servicos
+
+#### 6.3.3. Listar serviços de um utilizador
+
+**GET** /api/servicos/user/{idUser}
+
+**Descrição:** devolve todos os serviços criados por um determinado utilizador/prestador.
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_servico": 8,      "titulo": "Arranjar tomada",      "preco": 35.5    }  ]   `
+
+#### 6.3.4. Listar serviços por categoria de vendedor
+
+**GET** /api/servicos/categoria/{idVendedorCategoria}
+
+**Descrição:** útil para mostrar serviços ligados a uma categoria específica (ex.: canalização).
+
+### 6.4. Categorias (sugestão)
+
+Se quiseres expor as categorias para o frontend/Android:
+
+**GET** /api/categorias
+
+**Resposta 200:**
+
+Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    { "id_categoria": 1, "nome": "Canalização" },    { "id_categoria": 2, "nome": "Eletricidade" },    { "id_categoria": 3, "nome": "Limpezas" }  ]   `
+
+7\. Estrutura de Dados
+----------------------
+
+### 7.1. Tabela user
+
+*   id\_user INT PK
+    
+*   nome VARCHAR(100)
+    
+*   email VARCHAR(150) UNIQUE
+    
+*   palavra\_passe VARCHAR(255)
+    
+*   telemovel VARCHAR(20)
+    
+*   id\_localizacao INT NULL
+    
+
+### 7.2. Tabela vendedor
+
+*   id\_vendedor INT PK
+    
+*   nome VARCHAR(100)
+    
+*   email VARCHAR(150) UNIQUE
+    
+*   telemovel VARCHAR(20)
+    
+*   id\_user INT NULL (1:1 com user)
+    
+*   id\_localizacao INT NULL
+    
+
+### 7.3. Tabela categoria
+
+*   id\_categoria INT PK
+    
+*   nome VARCHAR(100)
+    
+
+### 7.4. Tabela vendedor\_categoria
+
+*   id\_vendedor\_categoria INT PK
+    
+*   id\_vendedor INT FK
+    
+*   id\_categoria INT FK
+    
+*   descricao VARCHAR(255) NULL
+    
+
+### 7.5. Tabela servico
+
+*   id\_servico INT PK
+    
+*   titulo VARCHAR(150)
+    
+*   preco DECIMAL(10,2)
+    
+*   data\_publicacao DATETIME
+    
+*   id\_vendedor\_categoria INT FK
+    
+*   id\_user INT FK
+    
+*   id\_estado INT FK
+    
+
+8\. Segurança / JWT
+-------------------
+
+*   O endpoint /api/users/login devolve um **token JWT**.
+    
+*   Authorization: Bearer
+    
+*   A configuração de segurança ainda não está a bloquear os endpoints (pode ser adicionada uma classe SecurityConfig e um filtro JWT para proteger rotas específicas).
+    
+
+9\. Fluxo de Registo Automático (User → Vendedor)
+-------------------------------------------------
+
+1.  O utilizador preenche o formulário no Android.
+    
+2.  O Android envia para /api/users/register o JSON com is\_vendedor.
+    
+3.  O backend:
+    
+    *   cria o user;
+        
+    *   se is\_vendedor = true, cria também vendedor;
+        
+    *   se vier categorias, cria em vendedor\_categoria.
+        
+4.  O backend devolve o user, o vendedor (se existir) e um token.
+    
+
+10\. Observações Finais
+-----------------------
+
+*   A API está preparada para crescer com:
+    
+    *   endpoint de avaliações (/api/avaliacoes);
+        
+    *   endpoint de estados de serviço;
+        
+    *   endpoint de imagens.
+        
+*   As foreign keys na BD garantem que não há serviços “soltos” sem vendedor/categoria/utilizador.
+
 ---
 
 ## 6. Conclusão
