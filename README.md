@@ -163,15 +163,173 @@ Mockups disponíveis em: [FazTudo - Figma](https://www.figma.com/make/2AUanzGmjU
 - O projeto decorre entre **1 de outubro e 14 de dezembro de 2025**.  
 - A fase final inclui correções e otimizações com base nos testes e feedback dos utilizadores.
 
+## 5. Base de Dados – Dicionário de Dados e Modelo Entidade-Relação
+
+### 5.1. Introdução
+A base de dados **FazTudoDB** foi concebida para suportar o funcionamento da aplicação “FazTudo”, permitindo gerir utilizadores, vendedores, categorias, serviços e avaliações de forma estruturada e segura.
+
 ---
 
-## 5. Conclusão
+### 5.2. Entidades e Estrutura Geral
+A BD é composta por oito entidades principais, com relações normalizadas (1:1 e 1:N), garantindo integridade e consistência de dados.
+
+| **Tabela** | **Descrição** |
+|-------------|---------------|
+| **localizacao** | Armazena morada, cidade e código postal dos utilizadores e vendedores. |
+| **estado** | Define o estado de um serviço (ativo, pendente, concluído). |
+| **categoria** | Classificação dos serviços disponíveis. |
+| **user** | Representa os utilizadores (clientes) da aplicação. |
+| **vendedor** | Representa os prestadores de serviço, podendo ter ligação 1:1 a um utilizador. |
+| **vendedor_categoria** | Liga vendedores a categorias de serviço específicas. |
+| **servico** | Serviços oferecidos pelos vendedores a utilizadores. |
+| **avaliacao** | Avaliações e comentários realizados pelos utilizadores. |
+
+---
+
+### 5.3. Dicionário de Dados
+
+#### **Tabela: localizacao**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_localizacao | INT | PK | Identificador único |
+| cidade | VARCHAR(80) |  | Cidade |
+| morada | VARCHAR(150) |  | Morada completa |
+| codigo_postal | VARCHAR(15) |  | Código postal |
+
+---
+
+#### **Tabela: estado**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_estado | INT | PK | Identificador |
+| nome | VARCHAR(50) |  | Nome do estado |
+
+---
+
+#### **Tabela: categoria**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_categoria | INT | PK | Identificador |
+| nome | VARCHAR(100) |  | Nome da categoria |
+
+---
+
+#### **Tabela: user**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_user | INT | PK | Identificador do utilizador |
+| nome | VARCHAR(100) |  | Nome completo |
+| email | VARCHAR(150) | UNIQUE | Email |
+| palavra_passe | VARCHAR(255) |  | Palavra-passe cifrada |
+| telemovel | VARCHAR(20) |  | Contacto |
+| data_registo | DATETIME |  | Data de registo |
+| id_localizacao | INT | FK | FK → localizacao |
+
+---
+
+#### **Tabela: vendedor**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_vendedor | INT | PK | Identificador do vendedor |
+| nome | VARCHAR(100) |  | Nome completo |
+| email | VARCHAR(150) | UNIQUE | Email |
+| telemovel | VARCHAR(20) |  | Contacto |
+| data_registo | DATETIME |  | Data de registo |
+| id_localizacao | INT | FK | FK → localizacao |
+| id_user | INT | FK/UNIQUE | Ligação 1:1 opcional com user |
+
+---
+
+#### **Tabela: vendedor_categoria**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_vendedor_categoria | INT | PK | Identificador |
+| id_categoria | INT | FK | FK → categoria |
+| id_vendedor | INT | FK | FK → vendedor |
+| descricao | VARCHAR(255) |  | Descrição dos serviços |
+| data_registo | DATETIME |  | Data de registo |
+
+---
+
+#### **Tabela: servico**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_servico | INT | PK | Identificador |
+| titulo | VARCHAR(150) |  | Título do serviço |
+| preco | DECIMAL(10,2) |  | Preço |
+| data_publicacao | DATETIME |  | Data de publicação |
+| id_vendedor_categoria | INT | FK | FK → vendedor_categoria |
+| id_user | INT | FK | FK → user |
+| id_estado | INT | FK | FK → estado |
+
+---
+
+#### **Tabela: avaliacao**
+| Campo | Tipo | Chave | Descrição |
+|-------|------|-------|-----------|
+| id_avaliacao | INT | PK | Identificador |
+| id_user | INT | FK | FK → user |
+| id_vendedor_categoria | INT | FK | FK → vendedor_categoria |
+| nota | TINYINT |  | Pontuação (1 a 5) |
+| comentario | TEXT |  | Comentário textual |
+| data_avaliacao | DATETIME |  | Data e hora da avaliação |
+
+---
+
+### 5.4. Modelo Entidade-Relação (Descrição)
+O modelo E-R apresenta as seguintes relações:
+
+- **User (1)** → **Serviço (N)**  
+- **User (1)** → **Avaliação (N)**  
+- **Vendedor (1)** → **Vendedor_Categoria (N)**  
+- **Categoria (1)** → **Vendedor_Categoria (N)**  
+- **Vendedor_Categoria (1)** → **Serviço (N)**  
+- **Estado (1)** → **Serviço (N)**  
+- **Localização (1)** → **User / Vendedor (N)**  
+- **Vendedor_Categoria (1)** → **Avaliação (N)**  
+
+---
+
+### 5.5. Guia de Dados (Exemplo)
+| Tabela | Exemplo de Dados |
+|---------|------------------|
+| **localizacao** | (1, “Lisboa”, “Av. da Liberdade, 100”, “1000-000”) |
+| **estado** | (1, “Ativo”), (2, “Concluído”), (3, “Cancelado”) |
+| **categoria** | (1, “Canalização”), (2, “Limpeza”), (3, “Pintura”) |
+| **user** | (1, “Maria Silva”, “maria@email.com”, “***”, “912345678”, “2025-01-01”, 1) |
+| **vendedor** | (1, “João Santos”, “joao@email.com”, “913456789”, “2025-01-03”, 1, 1) |
+| **vendedor_categoria** | (1, 1, 1, “Serviços de canalização residencial”, “2025-01-04”) |
+| **servico** | (1, “Reparação de canos”, 50.00, “2025-02-01”, 1, 1, 1) |
+| **avaliacao** | (1, 1, 1, 5, “Excelente serviço!”, “2025-02-05”) |
+
+---
+
+### 5.6. Estrutura dos Ficheiros
+
+- **create.sql** → Criação de tabelas, chaves e restrições.  
+- **populate.sql** → Inserção de dados de teste realistas.  
+- **queries.sql** → Consultas exemplificativas, por exemplo:
+
+```sql
+-- Listar serviços ativos e respetivos vendedores
+SELECT s.titulo, s.preco, v.nome AS vendedor, c.nome AS categoria
+FROM servico s
+JOIN vendedor_categoria vc ON s.id_vendedor_categoria = vc.id_vendedor_categoria
+JOIN vendedor v ON vc.id_vendedor = v.id_vendedor
+JOIN categoria c ON vc.id_categoria = c.id_categoria
+JOIN estado e ON s.id_estado = e.id_estado
+WHERE e.nome = 'Ativo';
+
+
+---
+
+## 6. Conclusão
 O projeto **FazTudo** irá criar uma aplicação eficiente e acessível para contratar e oferecer serviços num ambiente seguro, rápido e simples.
 
 
 ---
 
-## 6. Bibliografia
+## 7. Bibliografia
 - Fiverr: [https://www.fiverr.com](https://www.fiverr.com)  
 - Oscar App: [https://oscarapp.io](https://oscarapp.io)  
 
