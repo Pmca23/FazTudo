@@ -310,7 +310,7 @@ O modelo E-R apresenta as seguintes relações:
 - **populate.sql** → Inserção de dados de teste realistas.  
 - **queries.sql** → Consultas exemplificativas, por exemplo:
 
-sql
+```sql
 -- Listar serviços ativos e respetivos vendedores
 SELECT s.titulo, s.preco, v.nome AS vendedor, c.nome AS categoria
 FROM servico s
@@ -319,6 +319,7 @@ JOIN vendedor v ON vc.id_vendedor = v.id_vendedor
 JOIN categoria c ON vc.id_categoria = c.id_categoria
 JOIN estado e ON s.id_estado = e.id_estado
 WHERE e.nome = 'Ativo';
+```
 
 
 ---
