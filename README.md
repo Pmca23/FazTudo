@@ -195,6 +195,8 @@ A BD é composta por oito entidades principais, com relações normalizadas (1:1
 | cidade | VARCHAR(80) |  | Cidade |
 | morada | VARCHAR(150) |  | Morada completa |
 | codigo_postal | VARCHAR(15) |  | Código postal |
+| latitude| DOUBLE|  |  |
+| longitude| DOUBLE|  |  |  |  
 
 ---
 
@@ -293,7 +295,7 @@ O modelo E-R apresenta as seguintes relações:
 ### 5.5. Guia de Dados (Exemplo)
 | Tabela | Exemplo de Dados |
 |---------|------------------|
-| **localizacao** | (1, “Lisboa”, “Av. da Liberdade, 100”, “1000-000”) |
+| **localizacao** | (1, “Lisboa”, “Rua Augusta, 100”, “1000-000”,1100-053,38.7103, -9.1367) |
 | **estado** | (1, “Ativo”), (2, “Concluído”), (3, “Cancelado”) |
 | **categoria** | (1, “Canalização”), (2, “Limpeza”), (3, “Pintura”) |
 | **user** | (1, “Maria Silva”, “maria@email.com”, “***”, “912345678”, “2025-01-01”, 1) |
@@ -309,16 +311,283 @@ O modelo E-R apresenta as seguintes relações:
 - **create.sql** → Criação de tabelas, chaves e restrições.  
 - **populate.sql** → Inserção de dados de teste realistas.  
 - **queries.sql** → Consultas exemplificativas, por exemplo:
+```sql
+--DROP DATABASE IF EXISTS faztudodb;
+
+CREATE DATABASE faztudodb
+    DEFAULT CHARACTER SET utf8mb4
+    DEFAULT COLLATE utf8mb4_unicode_ci;
+
+USE faztudodb;
+
+-- =========================================================
+-- TABELAS
+-- =========================================================
+
+-- 1. LOCALIZACAO
+CREATE TABLE localizacao (
+    id_localizacao INT NOT NULL AUTO_INCREMENT,
+    cidade VARCHAR(80),
+    morada VARCHAR(150),
+    codigo_postal VARCHAR(15),
+    latitude DOUBLE,
+    longitude DOUBLE,
+    PRIMARY KEY (id_localizacao)
+);
+
+-- 2. ESTADO
+CREATE TABLE estado (
+    id_estado INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id_estado)
+);
+
+-- 3. CATEGORIA
+CREATE TABLE categoria (
+    id_categoria INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id_categoria)
+);
+
+-- 4. USER
+CREATE TABLE user (
+    id_user INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    palavra_passe VARCHAR(255) NOT NULL,
+    telemovel VARCHAR(20),
+    data_registo DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_localizacao INT,
+    PRIMARY KEY (id_user),
+    UNIQUE (email),
+    FOREIGN KEY (id_localizacao) REFERENCES localizacao(id_localizacao)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- 5. VENDEDOR
+CREATE TABLE vendedor (
+    id_vendedor INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    telemovel VARCHAR(20),
+    data_registo DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_localizacao INT,
+    id_user INT,
+    PRIMARY KEY (id_vendedor),
+    UNIQUE (email),
+    UNIQUE (id_user),
+    FOREIGN KEY (id_localizacao) REFERENCES localizacao(id_localizacao)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (id_user) REFERENCES user(id_user)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- 6. VENDEDOR_CATEGORIA
+CREATE TABLE vendedor_categoria (
+    id_vendedor_categoria INT NOT NULL AUTO_INCREMENT,
+    id_categoria INT NOT NULL,
+    id_vendedor INT NOT NULL,
+    descricao VARCHAR(255),
+    data_registo DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_vendedor_categoria),
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_vendedor) REFERENCES vendedor(id_vendedor)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- 7. SERVICO
+CREATE TABLE servico (
+    id_servico INT NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(150) NOT NULL,
+    descricao TEXT,
+    preco DECIMAL(10,2) NOT NULL,
+    data_publicacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_conclusao DATETIME,
+    id_vendedor_categoria INT NOT NULL,
+    id_user INT NOT NULL,
+    id_estado INT NOT NULL,
+    PRIMARY KEY (id_servico),
+    FOREIGN KEY (id_vendedor_categoria) REFERENCES vendedor_categoria(id_vendedor_categoria)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (id_user) REFERENCES user(id_user)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (id_estado) REFERENCES estado(id_estado)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- 8. AVALIACAO
+CREATE TABLE avaliacao (
+    id_avaliacao INT NOT NULL AUTO_INCREMENT,
+    id_user INT NOT NULL,
+    id_vendedor_categoria INT NOT NULL,
+    nota TINYINT,
+    comentario TEXT,
+    data_avaliacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_avaliacao),
+    FOREIGN KEY (id_user) REFERENCES user(id_user)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_vendedor_categoria) REFERENCES vendedor_categoria(id_vendedor_categoria)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- =========================================================
+-- ÍNDICES
+-- =========================================================
+
+CREATE INDEX idx_user_email ON user(email);
+CREATE INDEX idx_vendedor_email ON vendedor(email);
+CREATE INDEX idx_localizacao_coords ON localizacao(latitude, longitude);
 
 ```sql
--- Listar serviços ativos e respetivos vendedores
-SELECT s.titulo, s.preco, v.nome AS vendedor, c.nome AS categoria
-FROM servico s
-JOIN vendedor_categoria vc ON s.id_vendedor_categoria = vc.id_vendedor_categoria
-JOIN vendedor v ON vc.id_vendedor = v.id_vendedor
-JOIN categoria c ON vc.id_categoria = c.id_categoria
-JOIN estado e ON s.id_estado = e.id_estado
-WHERE e.nome = 'Ativo';
+-- Populate Base de Dados
+USE faztudodb;
+
+-- Estados
+INSERT INTO estado (nome) VALUES
+('Pendente'),
+('Em Andamento'),
+('Concluído'),
+('Cancelado');
+
+-- Categorias
+INSERT INTO categoria (nome) VALUES
+('Canalizador'),
+('Eletricista'),
+('Limpezas'),
+('Pintura'),
+('Jardinagem'),
+('Reparações Gerais');
+
+-- Localizações (com coordenadas de Lisboa)
+INSERT INTO localizacao (cidade, morada, codigo_postal, latitude, longitude) VALUES
+('Lisboa', 'Rua Augusta, 100', '1100-053', 38.7103, -9.1367),
+('Lisboa', 'Avenida da Liberdade, 200', '1250-147', 38.7223, -9.1477),
+('Cascais', 'Rua Frederico Arouca, 50', '2750-353', 38.6979, -9.4215),
+('Sintra', 'Praça da República, 25', '2710-616', 38.8029, -9.3817),
+('Lisboa', 'Rua do Ouro, 150', '1100-063', 38.7115, -9.1387),
+('Oeiras', 'Avenida Marginal, 300', '2780-155', 38.6867, -9.3145),
+('Almada', 'Praça da Liberdade, 10', '2800-180', 38.6784, -9.1567),
+('Loures', 'Rua de São Pedro, 45', '2670-461', 38.8304, -9.1684);
+
+-- Utilizadores (senha: 123456789)
+INSERT INTO user (nome, email, palavra_passe, telemovel, id_localizacao) VALUES
+('João Silva', 'joao.silva@email.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '912345678', 1),
+('Maria Santos', 'maria.santos@email.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '923456789', 2),
+('Pedro Costa', 'pedro.costa@email.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '934567890', 3),
+('Ana Ferreira', 'ana.ferreira@email.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '945678901', 4);
+
+-- Vendedores (com localização e coordenadas)
+INSERT INTO vendedor (nome, email, telemovel, id_localizacao, id_user) VALUES
+('Manuel Pereira', 'manuel.pereira@faztudo.pt', '961111111', 5, NULL),
+('António Rodrigues', 'antonio.rodrigues@faztudo.pt', '962222222', 6, NULL),
+('Sofia Martins', 'sofia.martins@faztudo.pt', '963333333', 7, NULL),
+('Paulo Fernandes', 'paulo.fernandes@faztudo.pt', '964444444', 8, NULL);
+
+-- Vendedor-Categoria
+INSERT INTO vendedor_categoria (id_categoria, id_vendedor, descricao) VALUES
+(1, 1, 'Especialista em canalização. 15 anos de experiência.'),
+(2, 2, 'Instalações elétricas certificadas.'),
+(3, 3, 'Limpezas domésticas e comerciais.'),
+(6, 4, 'Pequenas reparações domésticas.');
+
+-- Serviços
+INSERT INTO servico (titulo, descricao, preco, id_vendedor_categoria, id_user, id_estado) VALUES
+('Reparação de torneira', 'Torneira da cozinha com fuga', 45.00, 1, 1, 3),
+('Instalação de tomadas', 'Instalação de 3 tomadas', 85.00, 2, 2, 3),
+('Limpeza geral', 'Limpeza completa de T3', 120.00, 3, 3, 2),
+('Reparação de porta', 'Porta que não fecha', 35.00, 4, 4, 1);
+
+-- Avaliações
+INSERT INTO avaliacao (id_user, id_vendedor_categoria, nota, comentario) VALUES
+(1, 1, 5, 'Excelente profissional!'),
+(2, 2, 4, 'Bom trabalho, pontual.'),
+(3, 3, 5, 'Casa ficou impecável!');
+
+-- =========================================================
+-- VERIFICAÇÃO FINAL (Opcional, mas útil)
+-- =========================================================
+SELECT 'Base de dados populada com sucesso!' AS Resultado;
+SELECT COUNT(*) AS Total_Servicos FROM servico;
+
+```sql
+-- 1 DETALHE DAS AVALIAÇÕES DADAS A UM SERVIÇO ESPECÍFICO (Canalizador)
+
+SELECT
+    u.nome AS Cliente,
+    a.nota AS Nota,
+    a.comentario AS Comentario,
+    a.data_avaliacao AS Data_Avaliacao
+FROM
+    avaliacao a
+JOIN
+    user u ON a.id_user = u.id_user
+JOIN
+    vendedor_categoria vc ON a.id_vendedor_categoria = vc.id_vendedor_categoria
+JOIN
+    vendedor v ON vc.id_vendedor = v.id_vendedor
+JOIN
+    categoria c ON vc.id_categoria = c.id_categoria
+WHERE
+    v.nome = 'Manuel Pereira' AND c.nome = 'Canalizador';
+
+-- 2. TOTAL DE SERVIÇOS POR ESTADO
+-- Visão geral do volume de trabalho (pendente, concluído, etc.).
+SELECT
+    e.nome AS Estado,
+    COUNT(s.id_servico) AS Total_Servicos
+FROM
+    estado e
+LEFT JOIN
+    servico s ON e.id_estado = s.id_estado
+GROUP BY
+    e.nome
+ORDER BY
+    Total_Servicos DESC;
+
+-- 3. CLASSIFICAÇÃO MÉDIA E NÚMERO DE AVALIAÇÕES POR VENDEDOR
+
+SELECT
+    v.nome AS Vendedor,
+    c.nome AS Categoria,
+    COUNT(a.id_avaliacao) AS Total_Avaliacoes,
+    ROUND(AVG(a.nota), 2) AS Classificacao_Media
+FROM
+    vendedor v
+JOIN
+    vendedor_categoria vc ON v.id_vendedor = vc.id_vendedor
+LEFT JOIN
+    avaliacao a ON vc.id_vendedor_categoria = a.id_vendedor_categoria
+JOIN 
+    categoria c ON vc.id_categoria = c.id_categoria -- Adicionei esta linha para garantir que 'c.nome' é reconhecido
+GROUP BY
+    v.nome, c.nome
+ORDER BY
+    Classificacao_Media DESC, Total_Avaliacoes DESC;
+
+-- 4. Listar todos os serviços em 'Em Andamento' e quem os solicitou
+
+SELECT
+    s.titulo AS Servico,
+    s.preco AS Preco,
+    u.nome AS Cliente,
+    v.nome AS Vendedor,
+    c.nome AS Categoria,
+    e.nome AS Estado
+FROM
+    servico s
+JOIN
+    user u ON s.id_user = u.id_user
+JOIN
+    estado e ON s.id_estado = e.id_estado
+JOIN
+    vendedor_categoria vc ON s.id_vendedor_categoria = vc.id_vendedor_categoria
+JOIN
+    vendedor v ON vc.id_vendedor = v.id_vendedor
+JOIN
+    categoria c ON vc.id_categoria = c.id_categoria
+WHERE
+    e.nome = 'Em Andamento';
 ```
 ### 5.7. Conclusão da Base de Dados
 
@@ -339,241 +608,812 @@ Assim, a BD serve de base estável para a API e para o frontend móvel, mantendo
 
 
 
-6\. API REST da Aplicação FazTudo
----------------------------------
-
-A API foi desenvolvida em **Spring Boot** e expõe endpoints REST para gerir utilizadores, vendedores, categorias, serviços e autenticação.A base de dados usada é MySQL (faztudodb).
-
-Base URL (ambiente local):
-
-YAMLXML`   http://localhost:8080   `
-
-### 6.1. Autenticação e Utilizadores
-
-#### 6.1.1. Listar todos os utilizadores
-
-**GET** /api/users
-
-**Descrição:** devolve todos os utilizadores registados no sistema.
-
-**Resposta 200:**
-
-YAMLXML`   [    {      "id_user": 1,      "nome": "João Silva",      "email": "joao@example.com",      "telemovel": "912345678"    }  ]   `
-
-#### 6.1.2. Registar utilizador (com opção de vendedor)
-
-**POST** /api/users/register
-
-**Descrição:**
-
-*   cria sempre um **user**;
-    
-*   se o campo is\_vendedor vier como true, cria também um **vendedor** associado a esse user;
-    
-*   se vier o array categorias, cria também registos em vendedor\_categoria.
-    
-
-**Body – utilizador normal:**
-
-YAMLXML`   {    "nome": "Maria Silva",    "email": "maria@example.com",    "telemovel": "912345678",    "palavra_passe": "123456",    "is_vendedor": false  }   `
-
-**Body – utilizador que é também vendedor:**
-
-YAMLXML`   {    "nome": "Carlos Prestador",    "email": "carlos@example.com",    "telemovel": "919191919",    "palavra_passe": "abc123",    "is_vendedor": true,    "categorias": [1, 3, 5]  }   `
-
-**Resposta 201 (quando também cria vendedor):**
-
-YAMLXML`   {    "user": {      "id_user": 11,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "vendedor": {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    "token": "JWT_AQUI"  }   `
-
-**Erros:**
-
-YAMLXML`   { "error": "Email já existe" }   `
-
-#### 6.1.3. Login
-
-**POST** /api/users/login
-
-**Descrição:** valida as credenciais e devolve um token JWT e dados do utilizador. O backend também verifica se o utilizador tem perfil de vendedor.
-
-**Body:**
-
-YAMLXML`   {    "email": "carlos@example.com",    "palavra_passe": "abc123"  }   `
-
-**Resposta 200:**
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "token": "JWT_AQUI",    "id_user": 11,    "nome": "Carlos Prestador",    "is_vendedor": true  }   `
-
-**Erros:**
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   { "error": "Credenciais inválidas" }   `
-
-### 6.2. Vendedores
-
-> Nota: neste projeto, o vendedor costuma ser criado automaticamente no /api/users/register quando o campo is\_vendedor = true. Estes endpoints servem sobretudo para consulta.
-
-#### 6.2.1. Listar vendedores
-
-**GET** /api/vendedores
-
-**Resposta 200:**
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   [    {      "id_vendedor": 1,      "nome": "João Eletricista",      "email": "joao@eletric.pt",      "telemovel": "912345678"    }  ]   `
-
-#### 6.2.2. Obter vendedor por ID
-
-**GET** /api/vendedores/{id}
-
-**Resposta 200:**
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id_vendedor": 3,    "nome": "Pedro Canalizador",    "email": "pedro@canos.pt"  }   `
-
-**Resposta 404:**
-
-YAMLXML`   { "error": "Vendedor não encontrado." }   `
-
-#### 6.2.3. Obter vendedor pelo id do utilizador
-
-**GET** /api/vendedores/user/{idUser}
-
-**Descrição:** útil para o frontend/Android, para saber se o utilizador logado tem perfil de vendedor.
-
-**Resposta 200:**
-
-YAMLXML`   {    "id_vendedor": 4,    "nome": "Carlos Prestador",    "email": "carlos@example.com"  }   `
-
-**Resposta 404:**
-
-YAMLXML`   { "error": "Este utilizador não é vendedor." }   `
-
-#### 6.2.4. Listar vendedores de uma categoria
-
-**GET** /api/vendedores/categoria/{idCategoria}
-
-**Descrição:** devolve os vendedores que pertencem a uma determinada categoria (com base na tabela de ligação vendedor\_categoria).
-
-**Resposta 200:**
-
-yYAMLXML`   [    {      "id_vendedor": 4,      "nome": "Carlos Prestador",      "email": "carlos@example.com"    },    {      "id_vendedor": 6,      "nome": "Joana Limpezas",      "email": "joana@clean.pt"    }  ]   `
-
-### 6.3. Serviços
-
-#### 6.3.1. Criar serviço
-
-**POST** /api/servicos
-
-**Descrição:** cria um serviço associado a:
-
-*   um utilizador (id\_user);
-    
-*   uma categoria de vendedor (id\_vendedor\_categoria);
-    
-*   e um estado (id\_estado).
-    
-
-**Body:**
-
-YAMLXML`   {    "titulo": "Arranjar tomada",    "preco": 35.5,    "id_user": 11,    "id_vendedor_categoria": 2,    "id_estado": 1  }   `
-
-**Resposta 201:**
-
-YAMLXML`   {    "id_servico": 8,    "titulo": "Arranjar tomada",    "preco": 35.5  }   `
-
-#### 6.3.2. Listar todos os serviços
-
-**GET** /api/servicos
-
-#### 6.3.3. Listar serviços de um utilizador
-
-**GET** /api/servicos/user/{idUser}
-
-**Descrição:** devolve todos os serviços criados por um determinado utilizador/prestador.
-
-**Resposta 200:**
-
-YAMLXML`   [    {      "id_servico": 8,      "titulo": "Arranjar tomada",      "preco": 35.5    }  ]   `
-
-#### 6.3.4. Listar serviços por categoria de vendedor
-
-**GET** /api/servicos/categoria/{idVendedorCategoria}
-
-**Descrição:** útil para mostrar serviços ligados a uma categoria específica (ex.: canalização).
-
-### 6.4. Categorias (sugestão)
-
-Se quiseres expor as categorias para o frontend/Android:
-
-**GET** /api/categorias
-
-**Resposta 200:**
-
-YAMLXML`   [    { "id_categoria": 1, "nome": "Canalização" },    { "id_categoria": 2, "nome": "Eletricidade" },    { "id_categoria": 3, "nome": "Limpezas" }  ]   `
-
-7\. Estrutura de Dados
-----------------------
-
-### 7.1. Tabela user
-
-*   id\_user INT PK
-    
-*   nome VARCHAR(100)
-    
-*   email VARCHAR(150) UNIQUE
-    
-*   palavra\_passe VARCHAR(255)
-    
-*   telemovel VARCHAR(20)
-    
-*   id\_localizacao INT NULL
-    
-
-### 7.2. Tabela vendedor
-
-*   id\_vendedor INT PK
-    
-*   nome VARCHAR(100)
-    
-*   email VARCHAR(150) UNIQUE
-    
-*   telemovel VARCHAR(20)
-    
-*   id\_user INT NULL (1:1 com user)
-    
-*   id\_localizacao INT NULL
-    
-
-### 7.3. Tabela categoria
-
-*   id\_categoria INT PK
-    
-*   nome VARCHAR(100)
-    
-
-### 7.4. Tabela vendedor\_categoria
-
-*   id\_vendedor\_categoria INT PK
-    
-*   id\_vendedor INT FK
-    
-*   id\_categoria INT FK
-    
-*   descricao VARCHAR(255) NULL
-    
-
-### 7.5. Tabela servico
-
-*   id\_servico INT PK
-    
-*   titulo VARCHAR(150)
-    
-*   preco DECIMAL(10,2)
-    
-*   data\_publicacao DATETIME
-    
-*   id\_vendedor\_categoria INT FK
-    
-*   id\_user INT FK
-    
-*   id\_estado INT FK
+# FazTudo REST API Documentation
+
+## Autenticação
+
+A API utiliza autenticação baseada em JWT (JSON Web Tokens). Para acessar endpoints protegidos, inclua o token no header:
+
+```
+Authorization: Bearer {seu-token-jwt}
+```
+
+## Base URL
+
+```
+https://api.faztudo.pt/api
+```
+
+---
+
+## Endpoints
+
+### Auth
+
+#### Registar Utilizador
+
+Cria uma nova conta de utilizador.
+
+```http
+POST /auth/register
+```
+
+**Request Body:**
+```json
+{
+    "nome": "João Silva",
+    "email": "joao@example.com",
+    "password": "senha123",
+    "telefone": "912345678",
+    "morada": "Rua Principal, 123",
+    "latitude": 38.7223,
+    "longitude": -9.1393
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "nome": "João Silva",
+        "email": "joao@example.com",
+        "telefone": "912345678",
+        "morada": "Rua Principal, 123"
+    }
+}
+```
+
+---
+
+#### Login
+
+Autentica um utilizador existente.
+
+```http
+POST /auth/login
+```
+
+**Request Body:**
+```json
+{
+    "email": "joao@example.com",
+    "password": "senha123"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "nome": "João Silva",
+        "email": "joao@example.com",
+        "telefone": "912345678",
+        "morada": "Rua Principal, 123"
+    }
+}
+```
+
+---
+
+### Users
+
+#### Obter Perfil Atual
+
+Retorna os dados do utilizador autenticado.
+
+```http
+GET /users/me
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "id": 1,
+    "nome": "João Silva",
+    "email": "joao@example.com",
+    "telefone": "912345678",
+    "morada": "Rua Principal, 123",
+    "latitude": 38.7223,
+    "longitude": -9.1393,
+    "dataCriacao": "2025-01-15T10:30:00"
+}
+```
+
+---
+
+#### Atualizar Perfil Atual
+
+Atualiza os dados do utilizador autenticado.
+
+```http
+PUT /users/me
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+    "nome": "João Pedro Silva",
+    "telefone": "913456789",
+    "morada": "Rua Nova, 456",
+    "latitude": 38.7223,
+    "longitude": -9.1393
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "id": 1,
+    "nome": "João Pedro Silva",
+    "email": "joao@example.com",
+    "telefone": "913456789",
+    "morada": "Rua Nova, 456",
+    "latitude": 38.7223,
+    "longitude": -9.1393
+}
+```
+
+---
+
+#### Obter Utilizador por ID
+
+Retorna os dados de um utilizador específico.
+
+```http
+GET /users/{id}
+```
+
+**Parameters:**
+- `id` (path) - ID do utilizador
+
+**Response:** `200 OK`
+```json
+{
+    "id": 1,
+    "nome": "João Silva",
+    "email": "joao@example.com",
+    "telefone": "912345678",
+    "morada": "Rua Principal, 123"
+}
+```
+
+---
+
+#### Listar Todos os Utilizadores
+
+Retorna a lista de todos os utilizadores.
+
+```http
+GET /users
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "nome": "João Silva",
+        "email": "joao@example.com",
+        "telefone": "912345678"
+    },
+    {
+        "id": 2,
+        "nome": "Maria Santos",
+        "email": "maria@example.com",
+        "telefone": "923456789"
+    }
+]
+```
+
+---
+
+### Categorias
+
+#### Listar Todas as Categorias
+
+Retorna todas as categorias de serviços disponíveis.
+
+```http
+GET /categorias
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "nome": "Canalizador",
+        "descricao": "Serviços de canalização e reparações hidráulicas"
+    },
+    {
+        "id": 2,
+        "nome": "Eletricista",
+        "descricao": "Instalações e reparações elétricas"
+    },
+    {
+        "id": 3,
+        "nome": "Pintor",
+        "descricao": "Pintura de interiores e exteriores"
+    }
+]
+```
+
+---
+
+#### Obter Categoria por ID
+
+Retorna os detalhes de uma categoria específica.
+
+```http
+GET /categorias/{id}
+```
+
+**Parameters:**
+- `id` (path) - ID da categoria
+
+**Response:** `200 OK`
+```json
+{
+    "id": 1,
+    "nome": "Canalizador",
+    "descricao": "Serviços de canalização e reparações hidráulicas"
+}
+```
+
+---
+
+#### Pesquisar Categorias
+
+Pesquisa categorias por termo.
+
+```http
+GET /categorias/search?termo={termo}
+```
+
+**Query Parameters:**
+- `termo` (string, required) - Termo de pesquisa
+
+**Exemplo:**
+```http
+GET /categorias/search?termo=eletric
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 2,
+        "nome": "Eletricista",
+        "descricao": "Instalações e reparações elétricas"
+    }
+]
+```
+
+---
+
+### Vendedores
+
+#### Listar Todos os Vendedores
+
+Retorna todos os vendedores registados.
+
+```http
+GET /vendedores
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "userId": 5,
+        "nome": "Manuel Alves",
+        "categoriaId": 1,
+        "categoriaNome": "Canalizador",
+        "avaliacaoMedia": 4.5,
+        "numeroAvaliacoes": 23,
+        "precoMedio": 35.00
+    },
+    {
+        "id": 2,
+        "userId": 8,
+        "nome": "António Costa",
+        "categoriaId": 2,
+        "categoriaNome": "Eletricista",
+        "avaliacaoMedia": 4.8,
+        "numeroAvaliacoes": 45,
+        "precoMedio": 40.00
+    }
+]
+```
+
+---
+
+#### Obter Vendedor por ID
+
+Retorna os detalhes de um vendedor específico.
+
+```http
+GET /vendedores/{id}
+```
+
+**Parameters:**
+- `id` (path) - ID do vendedor
+
+**Response:** `200 OK`
+```json
+{
+    "id": 1,
+    "userId": 5,
+    "nome": "Manuel Alves",
+    "email": "manuel@example.com",
+    "telefone": "934567890",
+    "categoriaId": 1,
+    "categoriaNome": "Canalizador",
+    "descricao": "Canalizador com 15 anos de experiência",
+    "avaliacaoMedia": 4.5,
+    "numeroAvaliacoes": 23,
+    "precoMedio": 35.00,
+    "latitude": 38.7223,
+    "longitude": -9.1393
+}
+```
+
+---
+
+#### Listar Vendedores por Categoria
+
+Retorna vendedores de uma categoria específica.
+
+```http
+GET /vendedores/categoria/{idCategoria}
+```
+
+**Parameters:**
+- `idCategoria` (path) - ID da categoria
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "userId": 5,
+        "nome": "Manuel Alves",
+        "categoriaId": 1,
+        "categoriaNome": "Canalizador",
+        "avaliacaoMedia": 4.5,
+        "numeroAvaliacoes": 23,
+        "precoMedio": 35.00
+    }
+]
+```
+
+---
+
+#### Pesquisar Vendedores Próximos
+
+Retorna vendedores de uma categoria próximos de uma localização.
+
+```http
+GET /vendedores/categoria/{idCategoria}/proximos?latitude={lat}&longitude={lng}&raioKm={raio}
+```
+
+**Parameters:**
+- `idCategoria` (path) - ID da categoria
+- `latitude` (query, required) - Latitude da localização
+- `longitude` (query, required) - Longitude da localização
+- `raioKm` (query, optional) - Raio de pesquisa em km (default: 50)
+
+**Exemplo:**
+```http
+GET /vendedores/categoria/1/proximos?latitude=38.7223&longitude=-9.1393&raioKm=10
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "userId": 5,
+        "nome": "Manuel Alves",
+        "categoriaId": 1,
+        "categoriaNome": "Canalizador",
+        "avaliacaoMedia": 4.5,
+        "numeroAvaliacoes": 23,
+        "precoMedio": 35.00,
+        "distanciaKm": 2.5
+    },
+    {
+        "id": 3,
+        "userId": 12,
+        "nome": "Pedro Santos",
+        "categoriaId": 1,
+        "categoriaNome": "Canalizador",
+        "avaliacaoMedia": 4.2,
+        "numeroAvaliacoes": 15,
+        "precoMedio": 30.00,
+        "distanciaKm": 5.8
+    }
+]
+```
+
+---
+
+#### Obter Avaliações de um Vendedor
+
+Retorna todas as avaliações de um vendedor.
+
+```http
+GET /vendedores/{id}/avaliacoes
+```
+
+**Parameters:**
+- `id` (path) - ID do vendedor
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "servicoId": 10,
+        "clienteNome": "João Silva",
+        "nota": 5,
+        "comentario": "Excelente profissional, muito pontual e eficiente!",
+        "data": "2025-01-10T14:30:00"
+    },
+    {
+        "id": 2,
+        "servicoId": 15,
+        "clienteNome": "Maria Costa",
+        "nota": 4,
+        "comentario": "Bom trabalho, mas demorou um pouco mais do que esperado.",
+        "data": "2025-01-08T10:15:00"
+    }
+]
+```
+
+---
+
+### Serviços
+
+#### Criar Serviço
+
+Cria um novo pedido de serviço.
+
+```http
+POST /servicos
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+    "vendedorId": 1,
+    "descricao": "Reparação de torneira na cozinha",
+    "dataAgendada": "2025-01-20T14:00:00",
+    "precoAcordado": 45.00
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "id": 25,
+    "clienteId": 1,
+    "clienteNome": "João Silva",
+    "vendedorId": 1,
+    "vendedorNome": "Manuel Alves",
+    "categoriaNome": "Canalizador",
+    "descricao": "Reparação de torneira na cozinha",
+    "estadoId": 1,
+    "estadoNome": "Pendente",
+    "dataAgendada": "2025-01-20T14:00:00",
+    "precoAcordado": 45.00,
+    "dataCriacao": "2025-01-15T11:00:00"
+}
+```
+
+---
+
+#### Obter Serviço por ID
+
+Retorna os detalhes de um serviço específico.
+
+```http
+GET /servicos/{id}
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Parameters:**
+- `id` (path) - ID do serviço
+
+**Response:** `200 OK`
+```json
+{
+    "id": 25,
+    "clienteId": 1,
+    "clienteNome": "João Silva",
+    "clienteTelefone": "912345678",
+    "clienteMorada": "Rua Principal, 123",
+    "vendedorId": 1,
+    "vendedorNome": "Manuel Alves",
+    "vendedorTelefone": "934567890",
+    "categoriaNome": "Canalizador",
+    "descricao": "Reparação de torneira na cozinha",
+    "estadoId": 1,
+    "estadoNome": "Pendente",
+    "dataAgendada": "2025-01-20T14:00:00",
+    "dataInicio": null,
+    "dataConclusao": null,
+    "precoAcordado": 45.00,
+    "dataCriacao": "2025-01-15T11:00:00"
+}
+```
+
+---
+
+#### Listar Meus Serviços (Cliente)
+
+Retorna os serviços solicitados pelo utilizador autenticado como cliente.
+
+```http
+GET /servicos/meus
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 25,
+        "vendedorNome": "Manuel Alves",
+        "categoriaNome": "Canalizador",
+        "descricao": "Reparação de torneira na cozinha",
+        "estadoNome": "Pendente",
+        "dataAgendada": "2025-01-20T14:00:00",
+        "precoAcordado": 45.00
+    },
+    {
+        "id": 18,
+        "vendedorNome": "António Costa",
+        "categoriaNome": "Eletricista",
+        "descricao": "Instalação de tomadas",
+        "estadoNome": "Concluído",
+        "dataAgendada": "2025-01-10T09:00:00",
+        "precoAcordado": 60.00
+    }
+]
+```
+
+---
+
+#### Listar Meus Serviços (Vendedor)
+
+Retorna os serviços atribuídos ao utilizador autenticado como vendedor.
+
+```http
+GET /servicos/meus/vendedor
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 25,
+        "clienteNome": "João Silva",
+        "clienteTelefone": "912345678",
+        "clienteMorada": "Rua Principal, 123",
+        "descricao": "Reparação de torneira na cozinha",
+        "estadoNome": "Pendente",
+        "dataAgendada": "2025-01-20T14:00:00",
+        "precoAcordado": 45.00
+    },
+    {
+        "id": 22,
+        "clienteNome": "Maria Santos",
+        "clienteTelefone": "923456789",
+        "clienteMorada": "Avenida Central, 789",
+        "descricao": "Desentupimento de cano",
+        "estadoNome": "Em Progresso",
+        "dataAgendada": "2025-01-16T10:00:00",
+        "precoAcordado": 50.00
+    }
+]
+```
+
+---
+
+#### Iniciar Serviço
+
+Marca um serviço como "Em Progresso".
+
+```http
+PATCH /servicos/{id}/iniciar
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Parameters:**
+- `id` (path) - ID do serviço
+
+**Response:** `200 OK`
+```json
+{
+    "id": 25,
+    "estadoNome": "Em Progresso",
+    "dataInicio": "2025-01-20T14:05:00"
+}
+```
+
+---
+
+#### Concluir Serviço
+
+Marca um serviço como "Concluído".
+
+```http
+PATCH /servicos/{id}/concluir
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Parameters:**
+- `id` (path) - ID do serviço
+
+**Response:** `200 OK`
+```json
+{
+    "id": 25,
+    "estadoNome": "Concluído",
+    "dataConclusao": "2025-01-20T16:30:00"
+}
+```
+
+---
+
+#### Cancelar Serviço
+
+Marca um serviço como "Cancelado".
+
+```http
+PATCH /servicos/{id}/cancelar
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Parameters:**
+- `id` (path) - ID do serviço
+
+**Response:** `200 OK`
+```json
+{
+    "id": 25,
+    "estadoNome": "Cancelado",
+    "dataCancelamento": "2025-01-19T10:00:00"
+}
+```
+
+---
+
+### Estados
+
+#### Listar Todos os Estados
+
+Retorna todos os estados possíveis de um serviço.
+
+```http
+GET /estados
+```
+
+**Response:** `200 OK`
+```json
+[
+    {
+        "id": 1,
+        "nome": "Pendente",
+        "descricao": "Serviço aguardando confirmação"
+    },
+    {
+        "id": 2,
+        "nome": "Em Progresso",
+        "descricao": "Serviço em execução"
+    },
+    {
+        "id": 3,
+        "nome": "Concluído",
+        "descricao": "Serviço finalizado"
+    },
+    {
+        "id": 4,
+        "nome": "Cancelado",
+        "descricao": "Serviço cancelado"
+    }
+]
+```
+
+---
+
+#### Obter Estado por ID
+
+Retorna os detalhes de um estado específico.
+
+```http
+GET /estados/{id}
+```
+
+**Parameters:**
+- `id` (path) - ID do estado
+
+**Response:** `200 OK`
+```json
+{
+    "id": 1,
+    "nome": "Pendente",
+    "descricao": "Serviço aguardando confirmação"
+}
+```
+
+---
+
+
+## Códigos de Status
+
+| Código | Descrição |
+|--------|-----------|
+| 200 | OK - Requisição bem-sucedida |
+| 201 | Created - Recurso criado com sucesso |
+| 400 | Bad Request - Dados inválidos |
+| 401 | Unauthorized - Autenticação necessária |
+| 403 | Forbidden - Sem permissão |
+| 404 | Not Found - Recurso não encontrado |
+| 500 | Internal Server Error - Erro no servidor |
+
+---
     
 
 8\. Segurança / JWT
