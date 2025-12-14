@@ -1416,7 +1416,7 @@ GET /estados/{id}
 ---
     
 
-8\. Segurança / JWT
+7\. Segurança / JWT
 -------------------
 
 *   O endpoint /api/users/login devolve um **token JWT**.
@@ -1424,48 +1424,67 @@ GET /estados/{id}
 *   Authorization: Bearer
     
 *   A configuração de segurança ainda não está a bloquear os endpoints (pode ser adicionada uma classe SecurityConfig e um filtro JWT para proteger rotas específicas).
-    
 
-9\. Fluxo de Registo Automático (User → Vendedor)
--------------------------------------------------
+## 8 Limitações de Implementação - Frontend vs Backend
 
-1.  O utilizador preenche o formulário no Android.
-    
-2.  O Android envia para /api/users/register o JSON com is\_vendedor.
-    
-3.  O backend:
-    
-    *   cria o user;
-        
-    *   se is\_vendedor = true, cria também vendedor;
-        
-    *   se vier categorias, cria em vendedor\_categoria.
-        
-4.  O backend devolve o user, o vendedor (se existir) e um token.
-    
+Apesar de o backend possuir funcionalidades completas para gestão de serviços, a implementação no frontend apresenta limitações significativas que afetam a experiência de utilizadores e vendedores,
+sendo o problema principal apenas o utilizador (user) conseguir cancelar pedidos através da interface, os vendedores (vendors) não têm acesso equivalente a esta funcionalidade.
 
-10\. Observações Finais
------------------------
+Interface de Visualização:
 
-*   A API está preparada para crescer com:
+Existe uma aba para visualizar serviços do utilizador (user), também existe uma aba para visualizar serviços do vendedor (vendor) Os pedidos efetuados não aparecem do lado do vendedor (vendor), o que impossibilita:
+
+* Visualização de novos pedidos
+ 
+* Aceitação de pedidos
+ 
+* Cancelamento de pedidos pelo vendedor
+
+* Gestão adequada do fluxo de trabalho
+
+### Funcionalidades Não Implementadas
+
+Embora o backend suporte estas operações, o frontend não implementa totalmente:
+
+* Avaliação de serviços
+
+* Interface incompleta ou ausente
+
+* Aceitação de pedidos pelo vendedor
+
+Não funcional apesar do backend suportar:
+
+* Cancelamento pelo vendedor
+
+ ### Para Utilizadores (Users)
+
+ Podem cancelar os seus próprios pedidos
+ 
+ Não recebem feedback visual adequado sobre o estado dos pedidos
+ 
+ Não conseguem avaliar serviços mesmo após conclusão
+ 
+ ### Para Vendedores (Vendors)
+ 
+ Não visualizam pedidos recebidos
+ 
+ Não podem aceitar/rejeitar pedidos
+ 
+ Não conseguem gerir o seu pipeline de trabalho
+ 
+ Impossibilitados de cancelar pedidos quando necessário
+
+ Outra função que queriamos implementar porém nem no backend nem no frontend seria o pagamento através da app de forma segura e um sistema de chat entre o user e o vendedor.
     
-    *   endpoint de avaliações (/api/avaliacoes);
-        
-    *   endpoint de estados de serviço;
-        
-    *   endpoint de imagens.
-        
-*   As foreign keys na BD garantem que não há serviços “soltos” sem vendedor/categoria/utilizador.
-
 ---
 
-## 6. Conclusão
+## 9. Conclusão
 O projeto **FazTudo** irá criar uma aplicação eficiente e acessível para contratar e oferecer serviços num ambiente seguro, rápido e simples.
 
 
 ---
 
-## 7. Bibliografia
+## 9. Bibliografia
 - Fiverr: [https://www.fiverr.com](https://www.fiverr.com)  
 - Oscar App: [https://oscarapp.io](https://oscarapp.io)  
 
